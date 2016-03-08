@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+       default-autowire="byName">
+
+    <tx:annotation-driven/>
+
+    <!-- Scans within the base package of the application for @Components to configure as beans -->
+    <context:component-scan base-package="com.firstsnow"/>
+
+    <bean id="centerSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" >
+            <value>jdbc:mysql://127.0.0.1:3306/firstsnow_center?characterEncoding=utf-8</value>
+        </property>
+        <property name="user" value="root"/>
+        <property name="password" value="tiger"/>
+        <property name="maxPoolSize" value="5"></property>
+        <property name="minPoolSize" value="1"></property>
+        <property name="initialPoolSize" value="5"></property>
+        <property name="acquireIncrement" value="5"></property>
+        <property name="maxIdleTime" value="20"></property>
+    </bean>
+
+    <bean id="dictDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" >
+            <value>jdbc:mysql://127.0.0.1:3306/firstsnow_dict_x?characterEncoding=utf-8</value>
+        </property>
+        <property name="user" value="root"/>
+        <property name="password" value="tiger"/>
+        <property name="maxPoolSize" value="5"></property>
+        <property name="minPoolSize" value="1"></property>
+        <property name="initialPoolSize" value="5"></property>
+        <property name="acquireIncrement" value="5"></property>
+        <property name="maxIdleTime" value="20"></property>
+    </bean>
+
+    <bean id="userDetailsManager" class="com.firstsnow.security.CenterUserDetailsService">
+        <property name="dataSource" ref="centerSource" />
+    </bean>
+
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8" />
+        <property name="maxUploadSize" value="10485760000" />
+        <property name="maxInMemorySize" value="40960" />
+    </bean>
+
+</beans>

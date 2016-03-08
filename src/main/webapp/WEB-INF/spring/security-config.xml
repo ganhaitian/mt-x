@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+          http://www.springframework.org/schema/security
+          http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+    <security:global-method-security secured-annotations="enabled" />
+
+    <security:http pattern="/crossdomain.xml" security="none"/>
+    <security:http pattern="/login" security="none"/>
+    <security:http pattern="/platform/**" security="none"/>
+    <security:http pattern="/testEcho" security="none"/>
+    <security:http pattern="/oauth/**" security="none" />
+    <security:http pattern="/css/**" security="none" />
+    <security:http pattern="/js/**" security="none" />
+    <security:http pattern="/resources/**" security="none" />
+
+	<!-- Configure Spring Security -->
+	<!-- use-expressions and hasRole only needed if jsp tags are used. 
+		If not using jsp tags you can omit the use-expressions property and set access="ROLE_USER" on the intercept-url tags -->
+	<security:http auto-config="false" use-expressions="true" entry-point-ref="loginEntryPoint">
+
+
+
+        <!--<security:form-login default-target-url="/dict/hero" authentication-failure-url="/login?error=1" />-->
+        <security:custom-filter position="FORM_LOGIN_FILTER" ref="multPlatformAuthenticationFilter" />
+        <security:logout />
+
+		<!--  Uncomment this section to enable security -->
+
+		<!-- 
+	    <security:intercept-url pattern="/**" access="isAuthenticated()" />
+		 -->
+        <security:intercept-url pattern="/**" access="hasAnyRole('ROLE_USER')" />
+	    <!-- sets this as the authentication filter over the default -->
+
+        <security:session-management>
+            <security:concurrency-control max-sessions="1" />
+        </security:session-management>
+	</security:http>
+
+    <!--
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userDetailsManager">
+            <security:password-encoder hash="sha-256"></security:password-encoder>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <bean id="myAuthenticationSuccHandler" class="com.firstsnow.security.MyAuthenticationSuccessHandler">
+        <property name="defaultTargetUrl" value="/admin/main"></property>
+    </bean>
+    -->
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="multPlatformAuthenticationProvider">
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <bean id="multPlatformAuthenticationProvider" class="com.firstsnow.security.MultPlatformAuthenticationProvider">
+        <property name="userDetailsService" ref="userDetailsManager"></property>
+    </bean>
+
+    <bean id="loginEntryPoint" class="com.firstsnow.security.LoginUrlEntryPoint">
+        <constructor-arg value="/login" />
+    </bean>
+
+    <bean id="successHandler"
+          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler"
+          p:defaultTargetUrl="/loginSuccess"
+    />
+
+    <bean id ="multPlatformAuthenticationFilter"
+          class="com.firstsnow.security.MultPlatformAuthenticationFilter"
+          p:authenticationManager-ref="authenticationManager"
+          p:authenticationSuccessHandler-ref="successHandler"
+    />
+
+</beans>
