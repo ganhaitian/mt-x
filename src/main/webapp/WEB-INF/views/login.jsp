@@ -44,6 +44,10 @@
                     <label for="">平台</label>
                     <input type="text" class="form-control" name="platformId"/>
                 </div>
+                <div class="form-group">
+                    <label for="">记住我</label>
+                    <input type="checkbox" class="form-control" name="_spring_security_remember_me"/>
+                </div>
                 <button class="btn btn-default" type="submit">提交</button>
             </form>
         </div>

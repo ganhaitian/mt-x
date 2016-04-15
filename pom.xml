@@ -269,6 +269,19 @@
       <artifactId>cglib</artifactId>
       <version>3.2.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.dangdang</groupId>
+      <artifactId>sharding-jdbc</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.dangdang</groupId>
+      <artifactId>sharding-jdbc-core</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+
   </dependencies>
 
 </project>

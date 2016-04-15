@@ -28,4 +28,13 @@ public class UserController {
         result.put("success",true);
         return result;
     }
+
+    @RequestMapping("/updateHero")
+    public
+    @ResponseBody
+    Map<String,Object> updateHero(){
+        Map<String,Object> result = Maps.newHashMap();
+        result.put("success",true);
+        return result;
+    }
 }

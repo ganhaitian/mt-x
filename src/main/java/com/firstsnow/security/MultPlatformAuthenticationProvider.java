@@ -46,6 +46,7 @@ public class MultPlatformAuthenticationProvider implements AuthenticationProvide
         UserDetails user = this.userCache.getUserFromCache(username);
         int platformId = 0;
 
+
         if(user == null){
             cacheWasUsed = false;
 
@@ -154,5 +155,13 @@ public class MultPlatformAuthenticationProvider implements AuthenticationProvide
 
     public void setUserDetailsService(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
+    }
+
+    public boolean isForcePrincipalAsString() {
+        return forcePrincipalAsString;
+    }
+
+    public void setForcePrincipalAsString(boolean forcePrincipalAsString) {
+        this.forcePrincipalAsString = forcePrincipalAsString;
     }
 }

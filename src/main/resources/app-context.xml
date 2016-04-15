@@ -27,6 +27,20 @@
         <property name="maxIdleTime" value="20"></property>
     </bean>
 
+    <bean id="userDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" >
+            <value>jdbc:mysql://192.168.1.105:3306/firstsnow_x?characterEncoding=utf-8</value>
+        </property>
+        <property name="user" value="root"/>
+        <property name="password" value="tiger"/>
+        <property name="maxPoolSize" value="5"></property>
+        <property name="minPoolSize" value="1"></property>
+        <property name="initialPoolSize" value="5"></property>
+        <property name="acquireIncrement" value="5"></property>
+        <property name="maxIdleTime" value="20"></property>
+    </bean>
+
     <bean id="dictDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
         <property name="jdbcUrl" >
@@ -50,6 +64,66 @@
         <property name="defaultEncoding" value="utf-8" />
         <property name="maxUploadSize" value="10485760000" />
         <property name="maxInMemorySize" value="40960" />
+    </bean>
+
+    <!-- 分库分表的配置 -->
+    <bean id="dataSourceRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.DataSourceRule">
+        <constructor-arg>
+            <map>
+                <entry key="ds_0" value-ref="userDataSource"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="databaseShardingAlgorithm" class="com.firstsnow.rdb.sharding.ModuloDatabaseShardingAlgorithm"/>
+    <bean id="moduloShardingAlgorithm" class="com.firstsnow.rdb.sharding.ModuloTableShardingAlgorithm"/>
+
+    <bean id="databaseShardingStrategy" class="com.dangdang.ddframe.rdb.sharding.api.strategy.database.DatabaseShardingStrategy">
+        <constructor-arg index ="0" value="player_id"/>
+        <constructor-arg index ="1" ref ="databaseShardingAlgorithm" />
+    </bean>
+
+    <bean id="tableShardingStrategy" class="com.dangdang.ddframe.rdb.sharding.api.strategy.table.TableShardingStrategy">
+        <constructor-arg index="0" value="player_id"/>
+        <constructor-arg index="1" ref="moduloShardingAlgorithm"/>
+    </bean>
+
+    <bean id="userTableNames" class="com.firstsnow.rdb.sharding.TablesBuilder">
+        <constructor-arg index="0" value="user_info"/>
+        <constructor-arg index="1" value="10"/>
+    </bean>
+
+    <bean id="userDataNames" class="com.firstsnow.rdb.sharding.TablesBuilder">
+        <constructor-arg index="0" value="user_data"/>
+        <constructor-arg index="1" value="100"/>
+    </bean>
+
+    <bean id="userTableRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.TableRule">
+        <constructor-arg index="0" value="user_info"/>
+        <constructor-arg index="1" ref="userTableNames" />
+        <constructor-arg index="2" ref="dataSourceRule"/>
+    </bean>
+
+    <bean id ="userDataRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.TableRule">
+        <constructor-arg index="0" value="user_data"/>
+        <constructor-arg index="1" ref="userDataNames" />
+        <constructor-arg index="2" ref="dataSourceRule"/>
+    </bean>
+
+    <bean id="shardingRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.ShardingRule">
+        <constructor-arg index="0"  ref="dataSourceRule"/>
+        <constructor-arg index="1" >
+            <list>
+                <ref bean="userTableRule"></ref>
+                <ref bean="userDataRule"></ref>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="2" ref="databaseShardingStrategy"/>
+        <constructor-arg index="3" ref="tableShardingStrategy"/>
+    </bean>
+
+    <bean id="shardingDataSource" class="com.dangdang.ddframe.rdb.sharding.api.ShardingDataSource">
+        <constructor-arg ref="shardingRule"/>
     </bean>
 
 </beans>

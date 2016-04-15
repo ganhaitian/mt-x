@@ -42,6 +42,9 @@
         <security:session-management>
             <security:concurrency-control max-sessions="1" />
         </security:session-management>
+
+        <security:remember-me services-ref="rememberMeServices" />
+
 	</security:http>
 
     <!--
@@ -57,13 +60,14 @@
     -->
 
     <security:authentication-manager alias="authenticationManager">
-        <security:authentication-provider ref="multPlatformAuthenticationProvider">
-        </security:authentication-provider>
+        <security:authentication-provider ref="multPlatformAuthenticationProvider" />
+        <security:authentication-provider ref="rememberMeAuthenticationProvider"/>
     </security:authentication-manager>
 
-    <bean id="multPlatformAuthenticationProvider" class="com.firstsnow.security.MultPlatformAuthenticationProvider">
-        <property name="userDetailsService" ref="userDetailsManager"></property>
-    </bean>
+    <bean id="multPlatformAuthenticationProvider" class="com.firstsnow.security.MultPlatformAuthenticationProvider"
+          p:userDetailsService-ref="userDetailsManager"
+          p:forcePrincipalAsString="true"
+    />
 
     <bean id="loginEntryPoint" class="com.firstsnow.security.LoginUrlEntryPoint">
         <constructor-arg value="/login" />
@@ -78,6 +82,19 @@
           class="com.firstsnow.security.MultPlatformAuthenticationFilter"
           p:authenticationManager-ref="authenticationManager"
           p:authenticationSuccessHandler-ref="successHandler"
+          p:rememberMeServices-ref="rememberMeServices"
+    />
+
+    <bean id="rememberMeServices"
+          class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices"
+          p:alwaysRemember="true"
+          p:userDetailsService-ref="userDetailsManager"
+          p:key="FIRST_SNOW_MUST_BE_SUCCESS"
+    />
+
+    <bean id="rememberMeAuthenticationProvider"
+          class="org.springframework.security.authentication.RememberMeAuthenticationProvider"
+          p:key="FIRST_SNOW_MUST_BE_SUCCESS"
     />
 
 </beans>
